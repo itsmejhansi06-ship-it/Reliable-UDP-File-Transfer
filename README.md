@@ -2,6 +2,26 @@
 
 Secure UDP-based resumable file transfer.
 
+
+# Problem Definition and Architecture           
+Problem           
+Traditional UDP communication is unreliable because:           
+-packets can be lost                     
+-packets can arrive out of order           
+-packets can be duplicated           
+However, UDP is faster than TCP.
+
+# Objectives           
+The system aims to:           
+-implement reliable file transfer over UDP           
+-implement sliding window protocol           
+-handle out-of-order packets           
+-support multiple concurrent clients           
+-ensure data integrity using SHA256           
+-provide secure control communication using SSL           
+
+
+
 ## Features
 - Custom reliable UDP protocol
 - SSL/TLS secure control channel
@@ -183,6 +203,7 @@ Improvements After Testing
 4.Edge Case Handling: Added validation for malformed requests, missing packets, and incomplete transmissions to prevent system failures.           
 5.Scalability Testing: Tested the system with multiple concurrent clients and optimized the server to handle simultaneous connections efficiently.           
 6.Stability Improvements: Introduced timeout and retry mechanisms to recover from packet loss and network delays.           
+
 
 
 
