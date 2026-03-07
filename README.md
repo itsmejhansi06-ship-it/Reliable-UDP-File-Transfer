@@ -176,10 +176,14 @@ The system was tested with increasing numbers of concurrent clients. As the numb
 
 Evidence of Refinement Based on Testing and Performance Results
 
-After extensive testing and performance evaluation, several refinements were implemented to improve the reliabilityof the system. Identified bugs were fixed to ensure stable operation during file transfers and client-server communication. Stability was enhanced by improving error handling mechanisms, allowing the system to  recover from unexpected situations.           
-Special attention was given to handling edge cases that could previously cause failures. These include abrupt client disconnections, SSL handshake failures, invalid or malformed inputs, and partial transmission errors. The system now detects such conditions and responds appropriately, preventing crashes and maintaining service availability. Additional validation checks and exception handling were introduced to ensure that incorrect or incomplete data does not disrupt the application.           
- These improvements significantly increased the system’s reliability, fault tolerance, and ability to handle real-world network conditions.
-   
+Improvements After Testing            
+
+1.Bug Fixes: Fixed issues related to packet ordering, acknowledgment handling, and retransmission in the sliding window protocol to ensure reliable file transfer over UDP.           
+2.Improved Error Handling: Added mechanisms to handle abrupt client disconnections, invalid inputs, and partial data transfers without crashing the server.        3.SSL Reliability: Implemented proper handling for SSL handshake failures to ensure secure and stable TCP connections before file transfer begins.           
+4.Edge Case Handling: Added validation for malformed requests, missing packets, and incomplete transmissions to prevent system failures.           
+5.Scalability Testing: Tested the system with multiple concurrent clients and optimized the server to handle simultaneous connections efficiently.           
+6.Stability Improvements: Introduced timeout and retry mechanisms to recover from packet loss and network delays.           
+
 
 
 
