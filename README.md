@@ -93,6 +93,38 @@ System Architecture:
   |<--- SHA256 verification ------|    
   
 ```
+
+# Core Implementation           
+The project uses low-level socket programming.           
+-Socket Creation           
+Client UDP socket:           
+udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)           
+Server UDP socket:           
+udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)           
+udp.bind((UDP_IP, UDP_PORT))           
+TCP socket for SSL control:           
+tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)           
+
+
+
+# Feature Implementation           
+-Reliable Data Transfer           
+The system implements Sliding Window Protocol.           
+Client sends multiple packets before waiting for acknowledgment.           
+-Packet Retransmission           
+If ACK is not received within timeout:The entire window is retransmitted.           
+-Out-of-Order Packet Handling           
+The server uses a packet buffer.           
+Packets are written only when the correct sequence number arrives.           
+-SSL Security           
+Control channel uses TLS encryption.                      
+-Multiple Client Support           
+The server uses multithreading.
+Each packet is processed in a new thread.                      
+This allows multiple clients to send files simultaneously.           
+
+
+
   Protocol Design:  
   
   Control Channel (TCP + TLS)  
@@ -111,22 +143,6 @@ Packet format:
 3. Payload  
    Raw binary chunk of the file being transferred.  
    
- Example Output                                                               
- 
-
-Client:
-
-Enter file name: test.txt                                                                 
-Resume from seq: -1  
-Client SHA256: 9766a8d62ab8cf2e72cc682788c77cb2a37210d8ce34c33495f818c3c8a48e8b
-
-Server:
-
-SSL Control Channel running...  
-UDP Data Channel running...  
-Finished: test.txt  
-Server SHA256: 9766a8d62ab8cf2e72cc682788c77cb2a37210d8ce34c33495f818c3c8a48e8b
-
 
 
 Performance Evaluation           
@@ -180,7 +196,7 @@ Resume feature works correctly.
 
            
 4.Latency           
-Latency refers to the time between sending a packet and receiving acknowledgment.
+Round Trip Time is measured for each packet.
 Measured latency was approximately:           
 10–20 ms on the local network.    
 
@@ -194,28 +210,32 @@ The system was tested with increasing numbers of concurrent clients. As the numb
 
           
 
-Evidence of Refinement Based on Testing and Performance Results
+# Optimization and Fixes           
+Several improvements were made during testing.
+-Bug Fixes           
+Problem:           
+Out-of-order packets caused file corruption.           
+Solution:           
+Added packet buffer mechanism.           
+           
+-Thread Safety           
+Problem:           
+Concurrent threads caused race conditions.           
+Solution:           
+lock = threading.Lock()           
+All buffer and progress updates are protected.           
 
-Improvements After Testing            
+-Improved Error Handling           
+Examples:           
+Packet error: KeyError           
+ConnectionResetError           
+Timeout retransmission                      
 
-1.Bug Fixes: Fixed issues related to packet ordering, acknowledgment handling, and retransmission in the sliding window protocol to ensure reliable file transfer over UDP.           
-2.Improved Error Handling: Added mechanisms to handle abrupt client disconnections, invalid inputs, and partial data transfers without crashing the server.        3.SSL Reliability: Implemented proper handling for SSL handshake failures to ensure secure and stable TCP connections before file transfer begins.           
-4.Edge Case Handling: Added validation for malformed requests, missing packets, and incomplete transmissions to prevent system failures.           
-5.Scalability Testing: Tested the system with multiple concurrent clients and optimized the server to handle simultaneous connections efficiently.           
-6.Stability Improvements: Introduced timeout and retry mechanisms to recover from packet loss and network delays.           
+-Handled using:           
+try / except blocks 
 
+-Resume Support           
+Client resumes transfer from last received packet.           
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+-Server tracks progress:           
+         
