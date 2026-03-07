@@ -2,6 +2,8 @@ import socket
 import ssl
 import json
 import hashlib
+import time
+import os
 
 SERVER_IP = "127.0.0.1"
 UDP_PORT = 5001
@@ -40,6 +42,9 @@ resume_from = resp["resume_from"]
 secure.close()
 
 print("Resume from seq:", resume_from)
+
+# ---------- PERFORMANCE TIMER START ----------
+start_time = time.time()
 
 # ---------- FILE TRANSFER ----------
 with open(filename, "rb") as f:
@@ -97,6 +102,19 @@ udp.sendto(make_packet({
     "filename": filename
 }), (SERVER_IP, UDP_PORT))
 
+# ---------- PERFORMANCE TIMER END ----------
+end_time = time.time()
+
+transfer_time = end_time - start_time
+
+# ---------- FILE SIZE ----------
+file_size = os.path.getsize(filename) / (1024 * 1024)  # MB
+
+# ---------- THROUGHPUT ----------
+throughput = file_size / transfer_time
+
+print("Transfer Time:", round(transfer_time, 2), "seconds")
+print("Throughput:", round(throughput, 2), "MB/s")
 
 # ---------- INTEGRITY CHECK ----------
 h = hashlib.sha256()
