@@ -15,6 +15,10 @@ WINDOW_SIZE = 5
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp.settimeout(1)
 
+# ---------- STORE SEND TIMES ----------
+send_times = {}
+latencies = []
+
 
 def make_packet(header, payload=b""):
     h = json.dumps(header).encode()
@@ -71,6 +75,9 @@ with open(filename, "rb") as f:
 
         udp.sendto(packet, (SERVER_IP, UDP_PORT))
 
+        # ---------- RECORD SEND TIME ----------
+        send_times[seq] = time.time()
+
         window.append((seq, packet))
 
         seq += 1
@@ -85,12 +92,21 @@ with open(filename, "rb") as f:
                     ack, _ = udp.recvfrom(1024)
 
                     ack = json.loads(ack.decode())
+                    ack_seq = ack["seq"]
 
-                    window = [w for w in window if w[0] != ack["seq"]]
+                    # ---------- LATENCY CALCULATION ----------
+                    rtt = (time.time() - send_times[ack_seq]) * 1000
+                    latencies.append(rtt)
+
+                    print(f"Packet {ack_seq} latency: {round(rtt,2)} ms")
+
+                    window = [w for w in window if w[0] != ack_seq]
 
                     break
 
                 except socket.timeout:
+
+                    print("Timeout → Retransmitting window")
 
                     for _, pkt in window:
                         udp.sendto(pkt, (SERVER_IP, UDP_PORT))
@@ -113,8 +129,18 @@ file_size = os.path.getsize(filename) / (1024 * 1024)  # MB
 # ---------- THROUGHPUT ----------
 throughput = file_size / transfer_time
 
-print("Transfer Time:", round(transfer_time, 2), "seconds")
+# ---------- LATENCY STATS ----------
+if latencies:
+    avg_latency = sum(latencies) / len(latencies)
+    max_latency = max(latencies)
+else:
+    avg_latency = 0
+    max_latency = 0
+
+print("\nTransfer Time:", round(transfer_time, 2), "seconds")
 print("Throughput:", round(throughput, 2), "MB/s")
+print("Average Latency:", round(avg_latency, 2), "ms")
+print("Max Latency:", round(max_latency, 2), "ms")
 
 # ---------- INTEGRITY CHECK ----------
 h = hashlib.sha256()
