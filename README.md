@@ -40,9 +40,9 @@ System Architecture:
                     +---------v----------+    
                     |        Server      |  
                     |--------------------|  
-                    | Resume Info        |  
-                    | Multi-client       |  
-                    | Threaded Handling  |  
+                     Resume Info         
+                    Multi-client      
+                    Threaded Handling  
                     +---------+----------+  
                               ^  
                               |  
@@ -55,7 +55,7 @@ System Architecture:
                     +----------------------+  
 
   Communication Flow:  
-  Client                         Server  
+  Client                               Server  
   |                               |  
   |--- TLS request (filename) --->|  
   |                               |  
@@ -103,6 +103,7 @@ SSL Control Channel running...
 UDP Data Channel running...  
 Finished: test.txt  
 Server SHA256: 9766a8d62ab8cf2e72cc682788c77cb2a37210d8ce34c33495f818c3c8a48e8b
+
 
 
 
