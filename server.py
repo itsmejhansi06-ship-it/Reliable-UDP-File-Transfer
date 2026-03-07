@@ -1,4 +1,8 @@
-import socket, ssl, threading, json, hashlib
+import socket
+import ssl
+import threading
+import json
+import hashlib
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 5001
@@ -23,20 +27,24 @@ def control_server():
 
         client, addr = tcp.accept()
 
-        secure = context.wrap_socket(client, server_side=True)
+        try:
+            secure = context.wrap_socket(client, server_side=True)
 
-        data = secure.recv(1024).decode()
+            data = secure.recv(1024).decode()
+            req = json.loads(data)
 
-        req = json.loads(data)
+            filename = req["filename"]
 
-        filename = req["filename"]
+            with lock:
+                last = progress.get(filename, -1)
 
-        with lock:
-            last = progress.get(filename, -1)
+            secure.send(json.dumps({"resume_from": last}).encode())
 
-        secure.send(json.dumps({"resume_from": last}).encode())
+        except Exception as e:
+            print("Control channel error:", e)
 
-        secure.close()
+        finally:
+            secure.close()
 
 
 # ---------- UDP DATA CHANNEL ----------
@@ -48,53 +56,73 @@ print("UDP Data Channel running...")
 
 def handle_packet(data, addr):
 
-    header_len = int.from_bytes(data[:2], "big")
+    try:
 
-    header = json.loads(data[2:2+header_len].decode())
+        header_len = int.from_bytes(data[:2], "big")
 
-    payload = data[2+header_len:]
+        header = json.loads(data[2:2+header_len].decode())
 
-    filename = header["filename"]
+        payload = data[2+header_len:]
 
-    if header["type"] == "DATA":
+        filename = header["filename"]
 
-        seq = header["seq"]
+        if header["type"] == "DATA":
 
-        with lock:
-            last = progress.get(filename, -1)
-
-        if seq == last + 1:
-
-            if seq == 0:
-                open("recv_"+filename, "wb").close()
-
-            with open("recv_"+filename, "ab") as f:
-                f.write(payload)
+            seq = header["seq"]
 
             with lock:
-                progress[filename] = seq
+                last = progress.get(filename, -1)
 
-        ack = json.dumps({"type": "ACK", "seq": seq}).encode()
+            # ---------- IN ORDER PACKET ----------
+            if seq == last + 1:
 
-        udp.sendto(ack, addr)
+                if seq == 0:
+                    open("recv_" + filename, "wb").close()
+
+                with open("recv_" + filename, "ab") as f:
+                    f.write(payload)
+
+                with lock:
+                    progress[filename] = seq
+
+                print(f"Received packet {seq}")
+
+            # ---------- SEND ACK ----------
+            ack = json.dumps({
+                "type": "ACK",
+                "seq": seq
+            }).encode()
+
+            udp.sendto(ack, addr)
 
 
-    elif header["type"] == "END":
+        elif header["type"] == "END":
 
-        print("Finished:", filename)
+            print("\nFile transfer finished:", filename)
 
-        h = hashlib.sha256()
+            h = hashlib.sha256()
 
-        with open("recv_"+filename, "rb") as f:
-            h.update(f.read())
+            with open("recv_" + filename, "rb") as f:
+                h.update(f.read())
 
-        print("Server SHA256:", h.hexdigest())
+            print("Server SHA256:", h.hexdigest())
 
 
+    except Exception as e:
+        print("Packet error:", e)
+
+
+# ---------- START CONTROL THREAD ----------
 threading.Thread(target=control_server, daemon=True).start()
 
+
+# ---------- RECEIVE LOOP ----------
 while True:
 
     data, addr = udp.recvfrom(4096)
 
-    threading.Thread(target=handle_packet, args=(data, addr), daemon=True).start()
+    threading.Thread(
+        target=handle_packet,
+        args=(data, addr),
+        daemon=True
+    ).start()
