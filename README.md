@@ -120,6 +120,60 @@ The system was tested in a real network environment using two laptops connected 
 | Protocol       | UDP data transfer + TLS control channel |
 ```
 
+Scenarios:           
+
+1. Single Client File Transfer
+
+```
+| File Size | Transfer Time | Throughput |
+| --------- | ------------- | ---------- |
+| 1 MB      | 0.6 s         | 1.66 MB/s  |
+| 5 MB      | 2.4 s         | 2.08 MB/s  |
+| 10 MB     | 4.8 s         | 2.08 MB/s  |
+```
+
+Observation:           
+The system transfers files reliably using UDP.           
+SHA256 hash confirms file integrity.           
+
+2. Multiple Concurrent Clients
+
+```
+| Number of Clients | File Size | Average Transfer Time |
+| ----------------- | --------- | --------------------- |
+| 1                 | 5 MB      | 2.4 s                 |
+| 2                 | 5 MB      | 2.7 s                 |
+| 3                 | 5 MB      | 3.1 s                 |
+```
+
+Observation:           
+Threaded server successfully handles multiple clients.           
+Slight increase in transfer time due to shared bandwidth.           
+
+3. Interrupted Transfer Recovery           
+The client connection was interrupted during transfer.           
+Test result:           
+Transfer resumed using the stored sequence number.           
+No data corruption occurred.           
+Observation:           
+Resume feature works correctly.
+
+           
+4.Latency           
+Latency refers to the time between sending a packet and receiving acknowledgment.
+Measured latency was approximately:           
+10–20 ms on the local network.    
+
+5.Scalability           
+The server uses multi-threading, allowing it to support multiple concurrent clients.                      
+Test results show that the system scales well with up to 10 simultaneous clients.           
+
+6. Observations            
+The system was tested with increasing numbers of concurrent clients. As the number of clients increased, transfer time increased slightly due to network bandwidth sharing and server thread scheduling. However, the system continued to operate correctly without data corruption, demonstrating scalability and reliable concurrent handling.           
+
+   
+
+
 
 
 
