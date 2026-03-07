@@ -125,7 +125,7 @@ This allows multiple clients to send files simultaneously.
 
 
 
-  Protocol Design:  
+#  Protocol Design:  
   
   Control Channel (TCP + TLS)  
      Purpose:  
@@ -145,7 +145,7 @@ Packet format:
    
 
 
-Performance Evaluation           
+# Performance Evaluation           
 The system was tested in a real network environment using two laptops connected to the same WiFi network.           
 ```
 | Component      | Specification                           |
@@ -239,3 +239,4 @@ Client resumes transfer from last received packet.
 
 -Server tracks progress:           
          
+
