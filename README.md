@@ -169,9 +169,18 @@ The server uses multi-threading, allowing it to support multiple concurrent clie
 Test results show that the system scales well with up to 10 simultaneous clients.           
 
 6. Observations            
-The system was tested with increasing numbers of concurrent clients. As the number of clients increased, transfer time increased slightly due to network bandwidth sharing and server thread scheduling. However, the system continued to operate correctly without data corruption, demonstrating scalability and reliable concurrent handling.           
+The system was tested with increasing numbers of concurrent clients. As the number of clients increased, transfer time increased slightly due to network bandwidth sharing and server thread scheduling. However, the system continued to operate correctly without data corruption, demonstrating scalability and reliable concurrent handling.
 
+
+          
+
+Evidence of Refinement Based on Testing and Performance Results
+
+After extensive testing and performance evaluation, several refinements were implemented to improve the reliabilityof the system. Identified bugs were fixed to ensure stable operation during file transfers and client-server communication. Stability was enhanced by improving error handling mechanisms, allowing the system to  recover from unexpected situations.           
+Special attention was given to handling edge cases that could previously cause failures. These include abrupt client disconnections, SSL handshake failures, invalid or malformed inputs, and partial transmission errors. The system now detects such conditions and responds appropriately, preventing crashes and maintaining service availability. Additional validation checks and exception handling were introduced to ensure that incorrect or incomplete data does not disrupt the application.           
+ These improvements significantly increased the system’s reliability, fault tolerance, and ability to handle real-world network conditions.
    
+
 
 
 
