@@ -235,8 +235,10 @@ Timeout retransmission
 try / except blocks 
 
 -Resume Support           
-Client resumes transfer from last received packet.           
+Client resumes transfer from last received packet.                      
+resume_from = resp["resume_from"]           
 
--Server tracks progress:           
-         
+-Server tracks progress:                      
+  progress[filename]                  
+
 
