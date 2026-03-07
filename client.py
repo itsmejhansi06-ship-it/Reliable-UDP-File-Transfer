@@ -25,7 +25,7 @@ def make_packet(header, payload=b""):
     return len(h).to_bytes(2, "big") + h + payload
 
 
-filename = input("Enter file name: ")
+filename = "test_file/" + input("Enter file name: ")
 
 # ---------- SECURE CONTROL CHANNEL ----------
 context = ssl.create_default_context()
@@ -149,3 +149,4 @@ with open(filename, "rb") as f:
     h.update(f.read())
 
 print("Client SHA256:", h.hexdigest())
+
