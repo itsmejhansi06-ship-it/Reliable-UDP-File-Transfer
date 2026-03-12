@@ -139,7 +139,7 @@ Packet format:
  1. Header Length (2 bytes)  
    Indicates the size of the JSON header.  
  2. JSON Header  
-   Contains metadata including packet type, filename, and sequence number.  
+   Contains metadata including packet type(DATA,ACK,END), filename, and sequence number.  
 3. Payload  
    Raw binary chunk of the file being transferred.  
    
@@ -240,5 +240,6 @@ resume_from = resp["resume_from"]
 
 -Server tracks progress:                      
   progress[filename]                  
+
 
 
