@@ -212,7 +212,7 @@ The system was tested with increasing numbers of concurrent clients. As the numb
 
 # Optimization and Fixes           
 Several improvements were made during testing.
--Bug Fixes           
+           
 Problem:           
 Out-of-order packets caused file corruption.           
 Solution:           
@@ -240,6 +240,7 @@ resume_from = resp["resume_from"]
 
 -Server tracks progress:                      
   progress[filename]                  
+
 
 
 
