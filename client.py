@@ -5,7 +5,7 @@ import hashlib
 import time
 import os
 
-SERVER_IP = "127.0.0.1"
+SERVER_IP = "10.30.204.29"
 UDP_PORT = 5001
 TCP_PORT = 5002
 
